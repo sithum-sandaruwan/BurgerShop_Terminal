@@ -60,7 +60,8 @@ import java.util.*;
 
             }
 
-
+            boolean flag = true;
+            while(flag){
                     System.out.println("Enter Customer ID(Phone.No) : ");
                     String num = input.next();
 
@@ -70,13 +71,13 @@ import java.util.*;
                     String s = String.valueOf(num);
                     for (int i = 0; i < s.length(); i++) {
                         char ch = s.charAt(i);
-                        if (ch == '1')
+                        if (ch == '0') {
                             count++;
+                        }
                     }
 
 
-            boolean flag = true;
-            while(flag){
+
                 if (charNum == 0 && count == 10) {
                     for (int i = 0; i < Orders.length; i++) {
                         for (int j = 0; j < Orders[i][j]; j++) {
@@ -87,7 +88,7 @@ import java.util.*;
                 } else {
 
                     System.out.println("You entered invalid phone number.Enter valid phone number :");
-
+                    flag = true;
                 }
 
             }
