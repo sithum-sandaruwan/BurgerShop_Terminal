@@ -60,38 +60,11 @@ import java.util.*;
 
             }
 
-            boolean flag = true;
-            while(flag){
-                    System.out.println("Enter Customer ID(Phone.No) : ");
-                    String num = input.next();
-
-                    char charNum = num.charAt(0);
-
-                    int count = 0;
-                    String s = String.valueOf(num);
-                    for (int i = 0; i < s.length(); i++) {
-                        char ch = s.charAt(i);
-                        if (ch == '0') {
-                            count++;
-                        }
-                    }
+                System.out.println("Enter Customer ID(Phone.No) : ");
+                int Pnum = input.nextInt();
 
 
 
-                if (charNum == 0 && count == 10) {
-                    for (int i = 0; i < Orders.length; i++) {
-                        for (int j = 0; j < Orders[i][j]; j++) {
-
-                        }
-                    }
-                    flag = false;
-                } else {
-
-                    System.out.println("You entered invalid phone number.Enter valid phone number :");
-                    flag = true;
-                }
-
-            }
         }
 
 
