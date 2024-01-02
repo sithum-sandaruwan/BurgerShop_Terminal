@@ -3,12 +3,12 @@ import com.sun.source.tree.WhileLoopTree;
 
 import java.util.*;
     class Test {
-        private static int [][] Orders = new int[0][4];
-        private static int LastOrder = 1;
+        private static Long [][] Orders = new Long[0][4];
+        private static Long LastOrder = 1L;
         private static Scanner input = new Scanner(System.in);
 
-        public static int[][] incrementArray(){
-            int[][] temp = new int[Orders.length + 1][4];
+        public static Long[][] incrementArray(){
+            Long[][] temp = new Long[Orders.length + 1][4];
             for(int i = 0; i < Orders.length; i++){
                 for(int j = 0; j < Orders[i].length; j++){
                     temp[i][j] = Orders[i][j];
@@ -60,8 +60,53 @@ import java.util.*;
 
             }
 
-                System.out.println("Enter Customer ID(Phone.No) : ");
-                int Pnum = input.nextInt();
+            boolean flag = true;
+            while (flag) {
+                System.out.println("\nEnter Customer ID(Phone.No) : ");
+                Long Pnum = input.nextLong();
+
+                long Fdigit = 0;
+                int count = 1;
+                long temp = Pnum;
+
+
+                while (Pnum != Fdigit) {
+                    Fdigit = Pnum;
+                    Pnum /= 10;
+                }
+
+                while (temp != 0) {
+                    temp /= 10;
+                    count++;
+                }
+
+
+                if (Fdigit == 0 && count == 10) {
+                    flag = false;
+                //Pnum eka assign karanna array ekata
+                    for (int i = 0; i < Orders.length; i++) {
+
+                        Orders [i][0] = Pnum;
+                        System.out.println(Orders[i][0]);
+
+                    }
+
+
+                } else if (Fdigit > 0 || Fdigit < 0 || count > 10 || count < 10) {
+                    flag = true;
+                    System.out.println("You entered invalid phone number.Enter valid phone number !!");
+
+                }
+            }
+
+//            for (int i = 0; i < Orders.length; i++) {
+//                for (int j = 0; j < Orders[i].length; j++) {
+//
+//                    if (Orders[i][1] == ) {
+//
+//                    }
+//                }
+//            }
 
 
 
