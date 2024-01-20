@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class BurgerShop {
+public class BurgerShop{
     private static final int MAX_ORDERS = 100;
     private static final String[] orderIds = new String[MAX_ORDERS];
     private static final String[] customerIds = new String[MAX_ORDERS];
@@ -10,6 +10,20 @@ public class BurgerShop {
     private static int orderCount = 0;
     private static final double BURGER_PRICE = 500;
     private static final Scanner scanner = new Scanner(System.in);
+
+    public final static void clearConsole() {
+        try {
+            final String os = System.getProperty("os.name");
+            if (os.contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         int choice;
@@ -21,25 +35,49 @@ public class BurgerShop {
 
             switch (choice) {
                 case 1:
-                    System.out.println("\n----------------------------\n\t\tPlace Order\t\t\n----------------------------");
+                    clearConsole();
+                    System.out.println("\n============================================================");
+                    System.out.println("|                       PLACE ORDER                        |");
+                    System.out.println("============================================================");
                     placeOrder();
                     break;
                 case 2:
+                    clearConsole();
+                    System.out.println("\n============================================================");
+                    System.out.println("|                       BEST Customer                      |");
+                    System.out.println("============================================================");
                     searchBestCustomer();
                     break;
                 case 3:
+                    clearConsole();
+                    System.out.println("\n============================================================");
+                    System.out.println("|                   SEARCH ORDER DETAILS                   |");
+                    System.out.println("============================================================");
                     searchOrder();
                     break;
                 case 4:
+                    clearConsole();
+                    System.out.println("\n============================================================");
+                    System.out.println("|                SEARCH CUSTOMER DETAILS                   |");
+                    System.out.println("============================================================");
                     searchCustomer();
                     break;
                 case 5:
+                    clearConsole();
+                    System.out.println("\n============================================================");
+                    System.out.println("|                      VIEW ORDER LIST                     |");
+                    System.out.println("============================================================");
                     viewOrders();
                     break;
                 case 6:
+                    clearConsole();
+                    System.out.println("\n============================================================");
+                    System.out.println("|                   UPDATE ORDER DETAILS                   |");
+                    System.out.println("============================================================");
                     updateOrderDetails();
                     break;
                 case 7:
+                    clearConsole();
                     exit();
                     break;
                 default:
@@ -49,6 +87,7 @@ public class BurgerShop {
     }
 
     private static void displayHomePage() {
+        clearConsole();
         System.out.println("============================================================");
         System.out.println("|                     iHungry Burger                       |");
         System.out.println("============================================================");
@@ -64,7 +103,7 @@ public class BurgerShop {
     private static void placeOrder() {
 
         System.out.println("\nORDER ID - "+generateOrderId());
-        System.out.println("=============");
+        System.out.println("================");
 
         if (orderCount < MAX_ORDERS) {
             String orderId = generateOrderId();
@@ -99,16 +138,16 @@ public class BurgerShop {
             double totalBill = burgerQuantity * BURGER_PRICE;
             System.out.println("Total Bill Value: Rs. " + totalBill);
 
-            System.out.print("Are you confirming the order? (Y/N): ");
+            System.out.print("\nAre you confirming the order? (Y/N): ");
             char confirmation = scanner.next().charAt(0);
             if (confirmation == 'Y' || confirmation == 'y') {
                 orderCount++;
-                System.out.println("Order placed successfully!");
+                System.out.println("\nOrder placed successfully!");
             } else {
-                System.out.println("Order not confirmed.");
+                System.out.println("\nOrder not confirmed.");
             }
 
-            System.out.print("Do you want to place another order? (Y/N): ");
+            System.out.print("\nDo you want to place another order? (Y/N): ");
             char placeAnotherOrder = scanner.next().charAt(0);
             if (placeAnotherOrder == 'N' || placeAnotherOrder == 'n') {
                 return;
@@ -116,7 +155,7 @@ public class BurgerShop {
                 placeOrder();
             }
         } else {
-            System.out.println("Maximum orders reached. Cannot place more orders.");
+            System.out.println("\nMaximum orders reached. Cannot place more orders.");
         }
     }
 
@@ -139,30 +178,54 @@ public class BurgerShop {
 
     private static void searchBestCustomer() {
         if (orderCount == 0) {
-            System.out.println("No orders placed yet. Cannot determine the best customer.");
+            System.out.println("\nNo orders placed yet. Cannot determine the best customer.");
             return;
         }
 
-        String bestCustomer = null;
-        double maxTotalPurchases = -1;
-
+        double[] totalPurchasesArray = new double[orderCount];
         for (int i = 0; i < orderCount; i++) {
-            String currentCustomerId = customerIds[i];
-            double currentTotalPurchases = calculateTotalPurchases(currentCustomerId);
+            totalPurchasesArray[i] = calculateTotalPurchases(customerIds[i]);
+        }
 
-            if (currentTotalPurchases > maxTotalPurchases) {
-                maxTotalPurchases = currentTotalPurchases;
-                bestCustomer = customerNames[i];
+        for (int i = 0; i < orderCount - 1; i++) {
+            for (int j = i + 1; j < orderCount; j++) {
+                if (totalPurchasesArray[j] > totalPurchasesArray[i]) {
+                    double tempTotalPurchases = totalPurchasesArray[i];
+                    totalPurchasesArray[i] = totalPurchasesArray[j];
+                    totalPurchasesArray[j] = tempTotalPurchases;
+
+                    String tempCustomerId = customerIds[i];
+                    customerIds[i] = customerIds[j];
+                    customerIds[j] = tempCustomerId;
+
+                    String tempCustomerName = customerNames[i];
+                    customerNames[i] = customerNames[j];
+                    customerNames[j] = tempCustomerName;
+                }
             }
         }
+        System.out.println("\n");
+        String horizontalLine = "+-----------------+-----------------+-----------------+";
+        System.out.println(horizontalLine);
+        System.out.printf("| %-15s | %-15s | %-15s |\n", "CustomerID", "Name", "Total Purchases");
+        System.out.println(horizontalLine);
 
-        if (bestCustomer != null) {
-            System.out.println("Best Customer: " + bestCustomer);
-            System.out.println("Total Purchases: Rs. " + maxTotalPurchases);
-        } else {
-            System.out.println("No best customer found.");
+        for (int i = 0; i < orderCount; i++) {
+            System.out.printf("| %-15s | %-15s | Rs. %-11.2f |\n",
+                    customerIds[i], customerNames[i], totalPurchasesArray[i]);
+        }
+
+        System.out.println(horizontalLine);
+
+        System.out.print("\nDo you want to go back to the main menu? (Y/N): ");
+        char goBack = scanner.next().charAt(0);
+        if (goBack == 'N' || goBack == 'n') {
+            exit();
+        } else if (goBack == 'Y' || goBack == 'y') {
+            return;
         }
     }
+
 
     private static double calculateTotalPurchases(String customerId) {
         double totalPurchases = 0;
@@ -176,14 +239,22 @@ public class BurgerShop {
         return totalPurchases;
     }
     private static void searchOrder() {
-        System.out.print("Enter Order ID: ");
+        System.out.print("\nEnter Order ID: ");
         String orderId = scanner.nextLine();
 
         int foundOrderIndex = findOrderIndex(orderId);
         if (foundOrderIndex != -1) {
             displayOrderDetails(foundOrderIndex);
         } else {
-            System.out.println("Invalid Order ID. Order not found.");
+            System.out.print("\nInvalid Order ID. Do you want to enter again? (Y/N)> ");
+            char invalidOrderId = scanner.next().charAt(0);
+            scanner.nextLine();
+
+            if (invalidOrderId == 'N' || invalidOrderId == 'n') {
+                return;
+            } else if (invalidOrderId == 'Y' || invalidOrderId == 'y') {
+                searchOrder();
+            }
         }
     }
 
@@ -197,148 +268,272 @@ public class BurgerShop {
     }
 
     private static void searchCustomer() {
-        System.out.print("Enter Customer ID: ");
+        System.out.print("\nEnter Customer ID: ");
         String customerId = scanner.nextLine();
 
         int foundCustomerIndex = findCustomerIndex(customerId);
         if (foundCustomerIndex != -1) {
             displayCustomerDetails(foundCustomerIndex);
         } else {
-            System.out.println("Invalid Customer ID. Customer not found.");
+            System.out.print("\nThis customer ID is not added yet....");
+            System.out.print("\n");
+            System.out.print("\nDo you want to search another customer detail (Y/N): ");
+            char notYet = scanner.next().charAt(0);
+
+            scanner.nextLine();
+
+            if (notYet == 'N' || notYet == 'n') {
+                return;
+            } else if (notYet == 'Y' || notYet == 'y') {
+                searchCustomer();
+            }
         }
     }
 
     private static void viewOrders() {
-        System.out.println("===============");
-        System.out.println("  VIEW ORDERS");
-        System.out.println("===============");
-        System.out.println("1. Delivered Orders");
-        System.out.println("2. Preparing Orders");
-        System.out.println("3. Canceled Orders");
-        System.out.println("4. Back to Main Menu");
-        System.out.println("===============");
+        System.out.println("\n[1] Delivered Orders");
+        System.out.println("[2] Preparing Orders");
+        System.out.println("[3] Canceled Orders");
 
-        System.out.print("Enter your choice: ");
+        System.out.print("\nEnter an option to continue > ");
         int choice = scanner.nextInt();
         scanner.nextLine();
 
         switch (choice) {
             case 1:
-                displayOrdersByStatus(1); // Delivered Orders
+                clearConsole();
+                System.out.println("\n============================================================");
+                System.out.println("|                        DELIVERED ORDER                   |");
+                System.out.println("============================================================");
+                deliveredOrders(1);
                 break;
             case 2:
-                displayOrdersByStatus(0); // Preparing Orders
+                clearConsole();
+                System.out.println("\n============================================================");
+                System.out.println("|                      PREPARING ORDER                     |");
+                System.out.println("============================================================");
+                preparingOrders(0);
                 break;
             case 3:
-                displayOrdersByStatus(2); // Canceled Orders
-                break;
-            case 4:
-                // Back to main menu
+                clearConsole();
+                System.out.println("\n============================================================");
+                System.out.println("|                       CANCELED ORDER                     |");
+                System.out.println("============================================================");
+                canceledOrders(2);
                 break;
             default:
-                System.out.println("Invalid choice. Please enter a valid option.");
+                System.out.println("\nInvalid choice. Please enter a valid option.");
         }
     }
 
-    private static void displayOrdersByStatus(int orderStatus) {
-        System.out.println("===============");
-        System.out.println("  ORDER LIST");
-        System.out.println("===============");
+    private static void deliveredOrders(int status) {
+        displayOrdersByStatus("DELIVERED", status);
+    }
+
+    private static void preparingOrders(int status) {
+        displayOrdersByStatus("PREPARING", status);
+    }
+
+    private static void canceledOrders(int status) {
+        displayOrdersByStatus("CANCELED", status);
+    }
+
+    private static void displayOrdersByStatus(String orderStatus, int status) {
+        System.out.println("\n");
+        String horizontalLine = "+-----------------+-----------------+-----------------+-----------------+-----------------+-----------------+";
+        System.out.println(horizontalLine);
+
+        System.out.printf("| %-15s | %-15s | %-15s | %-15s | %-15s | %-15s |\n",
+                "OrderID", "CustomerID", "Name", "Quantity", "OrderValue", "OrderStatus");
+
+        System.out.println(horizontalLine);
+
         for (int i = 0; i < orderCount; i++) {
-            if (orderStatuses[i] == orderStatus) {
-                displayOrderDetails(i);
+            if (orderStatuses[i] == status) {
+                System.out.printf("| %-15s | %-15s | %-15s | %-15d | Rs. %-11.2f | %-15s |\n",
+                        orderIds[i], customerIds[i], customerNames[i],
+                        burgerQuantities[i], burgerQuantities[i] * BURGER_PRICE,
+                        orderStatus);
             }
         }
-        System.out.println("===============");
+
+        System.out.println(horizontalLine);
+        System.out.print("\nDo you want to go to the home page (Y/N): ");
+        char goHome = scanner.next().charAt(0);
+        if (goHome == 'N' || goHome == 'n') {
+            viewOrders();
+        } else if (goHome == 'Y' || goHome == 'y') {
+            return;
+        }
     }
 
+
     private static void updateOrderDetails() {
-        System.out.print("Enter Order ID to update: ");
+        System.out.print("\nEnter Order ID - ");
         String orderId = scanner.nextLine();
 
         int foundOrderIndex = findOrderIndex(orderId);
-        if (foundOrderIndex != -1 && orderStatuses[foundOrderIndex] == 0) {
+        if (foundOrderIndex != -1) {
             displayOrderDetails(foundOrderIndex);
 
-            System.out.println("===============");
-            System.out.println("  UPDATE OPTIONS");
-            System.out.println("===============");
-            System.out.println("1. Update Order Quantity");
-            System.out.println("2. Update Order Status");
-            System.out.println("3. Back to Main Menu");
-            System.out.println("===============");
+            if (orderStatuses[foundOrderIndex] == 2) {
+                System.out.println("\nThis order has already been canceled. You cannot update a canceled order.");
+            } else if (orderStatuses[foundOrderIndex] == 0) {
+                System.out.print("\nWhat do you want to update?\n");
+                System.out.println("[1] Quantity");
+                System.out.println("[2] Status");
 
-            System.out.print("Enter your choice: ");
-            int choice = scanner.nextInt();
+                System.out.print("\nEnter your option - ");
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (choice) {
+                    case 1:
+                        updateOrderQuantity(foundOrderIndex);
+                        break;
+                    case 2:
+                        updateOrderStatus(foundOrderIndex);
+                        break;
+                    default:
+                        System.out.println("\nInvalid choice. Please enter a valid option.");
+                }
+            } else if (orderStatuses[foundOrderIndex] == 1) {
+                System.out.println("\nThis order has already been delivered. You cannot update a delivered order.");
+            }
+
+            System.out.print("\nDo you want to update another order detail? (Y/N): ");
+            char op = scanner.next().charAt(0);
             scanner.nextLine();
-
-            switch (choice) {
-                case 1:
-                    updateOrderQuantity(foundOrderIndex);
-                    break;
-                case 2:
-                    updateOrderStatus(foundOrderIndex);
-                    break;
-                case 3:
-                    // Back to main menu
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please enter a valid option.");
+            if (op == 'N' || op == 'n') {
+                return;
+            } else if (op == 'Y' || op == 'y') {
+                updateOrderDetails();
             }
         } else {
-            System.out.println("Invalid Order ID or order status. Unable to update order.");
+            System.out.println("\nInvalid Order ID. Unable to update order.");
         }
     }
 
+
+
     private static void updateOrderQuantity(int orderIndex) {
-        System.out.print("Enter new Burger Quantity: ");
+        System.out.println("Quantity Update");
+        System.out.println("==============");
+
+        System.out.println("\nOrder ID: " + orderIds[orderIndex]);
+        System.out.println("Customer ID: " + customerIds[orderIndex]);
+        System.out.println("Customer Name: " + customerNames[orderIndex]);
+
+        System.out.print("\nEnter your quantity update value - ");
         int newQuantity;
         do {
             newQuantity = scanner.nextInt();
+            scanner.nextLine();
         } while (newQuantity <= 0);
 
         burgerQuantities[orderIndex] = newQuantity;
-        System.out.println("Order Quantity updated successfully!");
+        System.out.println("\nOrder Quantity updated successfully!");
+
+        System.out.println("\nNew Order Quantity - " + burgerQuantities[orderIndex]);
+
+        double updatedOrderValue = burgerQuantities[orderIndex] * BURGER_PRICE;
+        System.out.println("New Order Value - Rs. " + updatedOrderValue);
+
+        System.out.print("\nDo you want to update another order detail? (Y/N): ");
+        char op = scanner.next().charAt(0);
+        scanner.nextLine();
+        if (op == 'N' || op == 'n') {
+            return;
+        } else if (op == 'Y' || op == 'y') {
+            updateOrderDetails();
+        }
     }
 
-    private static void updateOrderStatus(int orderIndex) {
-        System.out.println("===============");
-        System.out.println("  ORDER STATUS");
-        System.out.println("===============");
-        System.out.println("1. PREPARING");
-        System.out.println("2. DELIVERED");
-        System.out.println("3. CANCEL");
-        System.out.println("===============");
 
-        System.out.print("Enter new Order Status (1-3): ");
+    private static void updateOrderStatus(int orderIndex) {
+        System.out.println("Order Status Update");
+        System.out.println("===================");
+
+        System.out.println("\nOrder ID: " + orderIds[orderIndex]);
+        System.out.println("Customer ID: " + customerIds[orderIndex]);
+        System.out.println("Customer Name: " + customerNames[orderIndex]);
+
+        System.out.println("\n[1] PREPARING");
+        System.out.println("[2] DELIVERED");
+        System.out.println("[3] CANCEL");
+
+        System.out.print("\nEnter new Order Status (1-3): ");
         int newStatus;
         do {
             newStatus = scanner.nextInt();
+            scanner.nextLine();  //
         } while (newStatus < 1 || newStatus > 3);
 
         orderStatuses[orderIndex] = newStatus - 1;
-        System.out.println("Order Status updated successfully!");
+        System.out.println("\nOrder Status updated successfully!");
+
+        System.out.println("\nNew Order Status: " + getOrderStatusString(orderStatuses[orderIndex]));
+
+        System.out.print("\nDo you want to update another order detail? (Y/N): ");
+        char updateAnother = scanner.next().charAt(0);
+        scanner.nextLine();  //
+        if (updateAnother == 'N' || updateAnother == 'n') {
+            return;
+        } else if (updateAnother == 'Y' || updateAnother == 'y') {
+            updateOrderDetails();
+        }
     }
 
+
+
     private static void displayOrderDetails(int orderIndex) {
-        System.out.println("===============");
-        System.out.println("  ORDER DETAILS");
-        System.out.println("===============");
-        System.out.println("Order ID: " + orderIds[orderIndex]);
-        System.out.println("Customer ID: " + customerIds[orderIndex]);
-        System.out.println("Customer Name: " + customerNames[orderIndex]);
-        System.out.println("Burger Quantity: " + burgerQuantities[orderIndex]);
-        System.out.println("Order Status: " + getOrderStatusString(orderStatuses[orderIndex]));
-        System.out.println("Total Bill Value: Rs. " + (burgerQuantities[orderIndex] * BURGER_PRICE));
-        System.out.println("===============");
+        System.out.println("\n");
+        String horizontalLine = "+-----------------+-----------------+-----------------+-----------------+-----------------+-----------------+";
+        System.out.println(horizontalLine);
+
+        System.out.printf("| %-15s | %-15s | %-15s | %-15s | %-15s | %-15s |\n",
+                "OrderID", "CustomerID", "Name", "Quantity", "OrderValue", "OrderStatus");
+
+        System.out.println(horizontalLine);
+
+        System.out.printf("| %-15s | %-15s | %-15s | %-15d | Rs. %-11.2f | %-15s |\n",
+                orderIds[orderIndex], customerIds[orderIndex], customerNames[orderIndex],
+                burgerQuantities[orderIndex], burgerQuantities[orderIndex] * BURGER_PRICE,
+                getOrderStatusString(orderStatuses[orderIndex]));
+
+        System.out.println(horizontalLine);
+        System.out.println("\n");
     }
 
     private static void displayCustomerDetails(int customerIndex) {
-        System.out.println("===============");
-        System.out.println("  CUSTOMER DETAILS");
-        System.out.println("===============");
+        System.out.println("\nCustomer ID: " + customerIds[customerIndex]);
         System.out.println("Customer Name: " + customerNames[customerIndex]);
-        System.out.println("===============");
+
+        System.out.println("\nCustomer Order Details");
+        System.out.println("======================");
+        System.out.println("\n");
+        System.out.println("+-----------------+-----------------+-----------------+");
+        System.out.printf("| %-15s | %-15s | %-15s |\n", "Order ID", "Quantity", "Total Value");
+        System.out.println("+-----------------+-----------------+-----------------+");
+
+        for (int i = 0; i < orderCount; i++) {
+            if (customerIds[i].equals(customerIds[customerIndex])) {
+                System.out.printf("| %-15s | %-15d | Rs. %-11.2f |\n",
+                        orderIds[i], burgerQuantities[i], burgerQuantities[i] * BURGER_PRICE);
+            }
+        }
+
+        System.out.println("+-----------------+-----------------+-----------------+");
+        System.out.print("\nDo you want to search another customer detail (Y/N): ");
+        char notYet = scanner.next().charAt(0);
+
+        scanner.nextLine();
+
+        if (notYet == 'N' || notYet == 'n') {
+            return;
+        } else if (notYet == 'Y' || notYet == 'y') {
+            searchCustomer();
+        }
     }
 
     private static String getOrderStatusString(int orderStatus) {
